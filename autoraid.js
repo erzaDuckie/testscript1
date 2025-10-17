@@ -275,7 +275,7 @@ contentFrame.BackgroundTransparency = 1
 local btnWorld = Instance.new("TextButton", contentFrame)
 btnWorld.Size = UDim2.new(1, -24, 0, 50)
 btnWorld.Position = UDim2.new(0,12,0,12)
-btnWorld.Text = "Escolher Mundo"
+btnWorld.Text = "SELECT STAGE"
 btnWorld.Font = Enum.Font.GothamBold
 btnWorld.TextSize = 16
 btnWorld.TextColor3 = Color3.fromRGB(255,255,255)
@@ -288,7 +288,7 @@ worldBtnCorner.CornerRadius = UDim.new(0,10)
 local btnRank = Instance.new("TextButton", contentFrame)
 btnRank.Size = UDim2.new(1, -24, 0, 50)
 btnRank.Position = UDim2.new(0,12,0,74)
-btnRank.Text = "Escolher Rank"
+btnRank.Text = "SELECT Rank"
 btnRank.Font = Enum.Font.GothamBold
 btnRank.TextSize = 16
 btnRank.TextColor3 = Color3.fromRGB(255,255,255)
@@ -455,7 +455,7 @@ end)
 btnStart.MouseButton1Click:Connect(function()
 	if running then
 		running = false
-		btnStart.Text = "INICIAR"
+		btnStart.Text = "START"
 		btnStart.BackgroundColor3 = Color3.fromRGB(60, 120, 60)
 		notify("Auto Raid parado")
 	else
@@ -469,7 +469,7 @@ btnStart.MouseButton1Click:Connect(function()
 		end
 
 		running = true
-		btnStart.Text = "PARAR"
+		btnStart.Text = "STOP"
 		btnStart.BackgroundColor3 = Color3.fromRGB(180, 60, 60)  -- Vermelho quando ativo
 		
 		local worldText = btnWorld.Text
@@ -537,4 +537,5 @@ UserInputService.InputBegan:Connect(function(input)
 end)
 
 print("Auto Raid GUI completa carregada!")
+
 
