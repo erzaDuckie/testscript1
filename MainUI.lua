@@ -800,7 +800,7 @@ local function setupPlayerTab()
     HitboxBox.Position = UDim2.new(0.62, 0, 0, 0)
     HitboxBox.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
     HitboxBox.BorderSizePixel = 0
-    HitboxBox.Text = "60"
+    HitboxBox.Text = "200"
     HitboxBox.PlaceholderText = "0-3000"
     HitboxBox.TextColor3 = Color3.fromRGB(255, 255, 255)
     HitboxBox.Font = Enum.Font.SourceSansBold
@@ -979,9 +979,9 @@ _G.autoRaidW7 = false
 _G.autoClick = true
 _G.HitboxSize = 2000
 _G.HitboxEnabled = true
+_G.autoCollectActive = true
 
 print("🚀 RN TEAM INTERFACE LOADED!")
 
 print("✅ Hitbox/Kill Aura system working perfectly!")
-
 
