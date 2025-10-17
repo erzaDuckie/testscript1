@@ -976,11 +976,12 @@ _G.autoHat = false
 _G.autoBackpack = false
 _G.autoRaidW3 = false
 _G.autoRaidW7 = false
-_G.autoClick = false
-_G.HitboxSize = 60
+_G.autoClick = true
+_G.HitboxSize = 2000
 _G.HitboxEnabled = true
 
 print("🚀 RN TEAM INTERFACE LOADED!")
 
 print("✅ Hitbox/Kill Aura system working perfectly!")
+
 
