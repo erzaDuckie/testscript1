@@ -1,4 +1,4 @@
--- Services
+-- Serviços
 local Players = game:GetService("Players")
 local LocalPlayer = Players.LocalPlayer
 local UserInputService = game:GetService("UserInputService")
@@ -7,18 +7,18 @@ local CoreGui = game:GetService("CoreGui")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 
--- Create ScreenGui
+-- Criar ScreenGui
 local ScreenGui = Instance.new("ScreenGui")
 ScreenGui.Parent = LocalPlayer:WaitForChild("PlayerGui")
 ScreenGui.ResetOnSpawn = false
 
--- Variables for drag control
+-- Variáveis para controle de arraste
 local dragging
 local dragInput
 local dragStart
 local startPos
 
--- Main window
+-- Janela principal
 local Frame = Instance.new("Frame")
 Frame.Size = UDim2.new(0, 280, 0, 350)
 Frame.Position = UDim2.new(0.35, 0, 0.3, 0)
@@ -27,7 +27,7 @@ Frame.BorderSizePixel = 0
 Frame.Parent = ScreenGui
 Instance.new("UICorner", Frame).CornerRadius = UDim.new(0, 8)
 
--- Title bar (for dragging)
+-- Barra de título (para arrastar)
 local TitleBar = Instance.new("Frame")
 TitleBar.Size = UDim2.new(1, 0, 0, 30)
 TitleBar.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
@@ -35,19 +35,19 @@ TitleBar.BorderSizePixel = 0
 TitleBar.Parent = Frame
 Instance.new("UICorner", TitleBar).CornerRadius = UDim.new(0, 8)
 
--- Centered title
-local Title = Instance.new("TextLabel")
-Title.Size = UDim2.new(0.8, 0, 1, 0)
-Title.Position = UDim2.new(0.1, 0, 0, 0)
-Title.BackgroundTransparency = 1
-Title.Text = "CITERRRR"
-Title.TextColor3 = Color3.fromRGB(255, 255, 255)
-Title.Font = Enum.Font.SourceSansBold
-Title.TextSize = 16
-Title.TextXAlignment = Enum.TextXAlignment.Center
-Title.Parent = TitleBar
+-- Título centralizado
+local Titulo = Instance.new("TextLabel")
+Titulo.Size = UDim2.new(0.8, 0, 1, 0)
+Titulo.Position = UDim2.new(0.1, 0, 0, 0)
+Titulo.BackgroundTransparency = 1
+Titulo.Text = "RN TEAM"
+Titulo.TextColor3 = Color3.fromRGB(255, 255, 255)
+Titulo.Font = Enum.Font.SourceSansBold
+Titulo.TextSize = 16
+Titulo.TextXAlignment = Enum.TextXAlignment.Center
+Titulo.Parent = TitleBar
 
--- Minimize button
+-- Botão de minimizar
 local MinimizeButton = Instance.new("TextButton")
 MinimizeButton.Size = UDim2.new(0, 30, 0, 30)
 MinimizeButton.Position = UDim2.new(1, -30, 0, 0)
@@ -58,7 +58,7 @@ MinimizeButton.Font = Enum.Font.SourceSansBold
 MinimizeButton.TextSize = 20
 MinimizeButton.Parent = TitleBar
 
--- Container for tabs
+-- Container para as abas
 local TabContainer = Instance.new("Frame")
 TabContainer.Size = UDim2.new(1, -10, 0, 35)
 TabContainer.Position = UDim2.new(0, 5, 0, 35)
@@ -67,13 +67,13 @@ TabContainer.BorderSizePixel = 0
 TabContainer.Parent = Frame
 Instance.new("UICorner", TabContainer).CornerRadius = UDim.new(0, 6)
 
--- Horizontal layout for tabs
+-- Layout horizontal para as abas
 local TabLayout = Instance.new("UIListLayout")
 TabLayout.FillDirection = Enum.FillDirection.Horizontal
 TabLayout.Padding = UDim.new(0, 2)
 TabLayout.Parent = TabContainer
 
--- Main container for content WITH SMOOTH SCROLLING
+-- Container principal para o conteúdo COM ROLAGEM SUAVE
 local MainContentContainer = Instance.new("ScrollingFrame")
 MainContentContainer.Size = UDim2.new(1, -10, 1, -110)
 MainContentContainer.Position = UDim2.new(0, 5, 0, 75)
@@ -84,18 +84,18 @@ MainContentContainer.ScrollBarImageTransparency = 1
 MainContentContainer.ClipsDescendants = true
 MainContentContainer.Parent = Frame
 
--- Fixed text at bottom (credits)
-local Credits = Instance.new("TextLabel")
-Credits.Size = UDim2.new(1, 0, 0, 25)
-Credits.Position = UDim2.new(0, 0, 1, -25)
-Credits.BackgroundTransparency = 1
-Credits.Text = "CITER BODOH"
-Credits.TextColor3 = Color3.fromRGB(200, 200, 200)
-Credits.Font = Enum.Font.SourceSansBold
-Credits.TextSize = 14
-Credits.Parent = Frame
+-- Texto fixo embaixo (créditos)
+local Creditos = Instance.new("TextLabel")
+Creditos.Size = UDim2.new(1, 0, 0, 25)
+Creditos.Position = UDim2.new(0, 0, 1, -25)
+Creditos.BackgroundTransparency = 1
+Creditos.Text = "YouTube: RN_TEAM"
+Creditos.TextColor3 = Color3.fromRGB(200, 200, 200)
+Creditos.Font = Enum.Font.SourceSansBold
+Creditos.TextSize = 14
+Creditos.Parent = Frame
 
--- Background frame to allow dragging from entire interface
+-- Frame de fundo para permitir arrastar por toda a interface
 local BackgroundDrag = Instance.new("Frame")
 BackgroundDrag.Size = UDim2.new(1, 0, 1, 0)
 BackgroundDrag.BackgroundTransparency = 1
@@ -103,7 +103,7 @@ BackgroundDrag.BorderSizePixel = 0
 BackgroundDrag.ZIndex = 0
 BackgroundDrag.Parent = Frame
 
--- Tab System
+-- Sistema de Abas
 local tabs = {}
 local currentTab = nil
 
@@ -139,40 +139,40 @@ local function createTab(tabName)
     tabs[tabName] = tab
     
     tabButton.MouseButton1Click:Connect(function()
-        -- Hide all tabs
+        -- Esconder todas as abas
         for name, tabData in pairs(tabs) do
             tabData.content.Visible = false
             tabData.button.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
             tabData.button.TextColor3 = Color3.fromRGB(200, 200, 200)
         end
         
-        -- Show clicked tab
+        -- Mostrar aba clicada
         tab.content.Visible = true
         tab.button.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
         tab.button.TextColor3 = Color3.fromRGB(255, 255, 255)
         
         currentTab = tabName
-        adjustWindowHeight()
+        ajustarAlturaJanela()
     end)
     
     return tab
 end
 
--- Function to automatically adjust window height
-local function adjustWindowHeight()
-    local minHeight = 350
-    local maxHeight = 450
+-- Função para ajustar automaticamente a altura da janela
+local function ajustarAlturaJanela()
+    local alturaMinima = 350
+    local alturaMaxima = 450
     
     if currentTab and tabs[currentTab] then
         local tabContent = tabs[currentTab].content
-        local contentHeight = tabs[currentTab].layout.AbsoluteContentSize.Y + 100
+        local alturaConteudo = tabs[currentTab].layout.AbsoluteContentSize.Y + 100
         
-        local newHeight = math.clamp(contentHeight, minHeight, maxHeight)
+        local novaAltura = math.clamp(alturaConteudo, alturaMinima, alturaMaxima)
         
         local tween = TweenService:Create(
             Frame,
             TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),
-            {Size = UDim2.new(0, 280, 0, newHeight)}
+            {Size = UDim2.new(0, 280, 0, novaAltura)}
         )
         tween:Play()
         
@@ -180,13 +180,13 @@ local function adjustWindowHeight()
     end
 end
 
--- Function to drag window
+-- Função para arrastar a janela
 local function update(input)
     local delta = input.Position - dragStart
     Frame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
 end
 
--- Connect drag events
+-- Conectar eventos de arraste
 local function connectDragEvents(frame)
     frame.InputBegan:Connect(function(input)
         if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
@@ -218,7 +218,7 @@ UserInputService.InputChanged:Connect(function(input)
     end
 end)
 
--- Function to minimize/maximize
+-- Função para minimizar/maximizar
 local isMinimized = false
 local originalSize = Frame.Size
 local minimizedSize = UDim2.new(0, 280, 0, 30)
@@ -235,7 +235,7 @@ MinimizeButton.MouseButton1Click:Connect(function()
         tween:Play()
         TabContainer.Visible = false
         MainContentContainer.Visible = false
-        Credits.Visible = false
+        Creditos.Visible = false
         BackgroundDrag.Visible = false
         MinimizeButton.Text = "+"
     else
@@ -247,38 +247,38 @@ MinimizeButton.MouseButton1Click:Connect(function()
         tween:Play()
         TabContainer.Visible = true
         MainContentContainer.Visible = true
-        Credits.Visible = true
+        Creditos.Visible = true
         BackgroundDrag.Visible = true
         MinimizeButton.Text = "-"
     end
 end)
 
--- Bar style button
-local function CreateButton(text, callback, parent)
-    local Button = Instance.new("TextButton")
-    Button.Size = UDim2.new(1, 0, 0, 35)
-    Button.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
-    Button.Text = text
-    Button.TextColor3 = Color3.fromRGB(255, 255, 255)
-    Button.Font = Enum.Font.SourceSansBold
-    Button.TextSize = 16
-    Button.ZIndex = 1
-    Button.Parent = parent or MainContentContainer
-    Instance.new("UICorner", Button).CornerRadius = UDim.new(0, 6)
+-- Botão estilo barra
+local function CriarBotao(texto, callback, parent)
+    local Botao = Instance.new("TextButton")
+    Botao.Size = UDim2.new(1, 0, 0, 35)
+    Botao.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+    Botao.Text = texto
+    Botao.TextColor3 = Color3.fromRGB(255, 255, 255)
+    Botao.Font = Enum.Font.SourceSansBold
+    Botao.TextSize = 16
+    Botao.ZIndex = 1
+    Botao.Parent = parent or MainContentContainer
+    Instance.new("UICorner", Botao).CornerRadius = UDim.new(0, 6)
 
-    Button.MouseEnter:Connect(function()
-        Button.BackgroundColor3 = Color3.fromRGB(70, 70, 70)
+    Botao.MouseEnter:Connect(function()
+        Botao.BackgroundColor3 = Color3.fromRGB(70, 70, 70)
     end)
-    Button.MouseLeave:Connect(function()
-        Button.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+    Botao.MouseLeave:Connect(function()
+        Botao.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
     end)
 
-    Button.MouseButton1Click:Connect(callback)
-    return Button
+    Botao.MouseButton1Click:Connect(callback)
+    return Botao
 end
 
--- Toggle (checkbox) FIXED
-local function CreateToggle(text, callback, parent)
+-- Toggle (checkbox) CORRIGIDO
+local function CriarToggle(texto, callback, parent)
     local ToggleContainer = Instance.new("Frame")
     ToggleContainer.Size = UDim2.new(1, 0, 0, 30)
     ToggleContainer.BackgroundTransparency = 1
@@ -288,7 +288,7 @@ local function CreateToggle(text, callback, parent)
     local Toggle = Instance.new("TextButton")
     Toggle.Size = UDim2.new(1, 0, 1, 0)
     Toggle.BackgroundTransparency = 1
-    Toggle.Text = text
+    Toggle.Text = texto
     Toggle.TextColor3 = Color3.fromRGB(255, 255, 255)
     Toggle.Font = Enum.Font.SourceSansBold
     Toggle.TextSize = 16
@@ -304,7 +304,7 @@ local function CreateToggle(text, callback, parent)
     Box.Parent = ToggleContainer
     Instance.new("UICorner", Box).CornerRadius = UDim.new(0, 4)
 
-    -- Initial state
+    -- Estado inicial
     local isActive = false
     
     local function updateToggle()
@@ -321,7 +321,7 @@ local function CreateToggle(text, callback, parent)
         callback(isActive)
     end)
     
-    -- Initialize
+    -- Inicializar
     updateToggle()
     
     return Toggle, Box, function(state) 
@@ -330,16 +330,16 @@ local function CreateToggle(text, callback, parent)
     end
 end
 
--- ===== MAIN TAB =====
+-- ===== ABA PRINCIPAL =====
 local function setupMainTab()
-    -- Auto Hat Toggle FIXED
-    local AutoHatToggle, AutoHatBox, setAutoHatState = CreateToggle("Auto Hat", function(isActive)
-        _G.autoHat = isActive
+    -- Toggle Auto Head CORRIGIDO
+    local AutoChapeuToggle, AutoChapeuBox, setAutoChapeuState = CriarToggle("Auto Head", function(isActive)
+        _G.autoChapeu = isActive
         
         if isActive then
-            print("🟢 Auto Hat ACTIVATED")
+            print("🟢 Auto Head ATIVADO")
             task.spawn(function()
-                while _G.autoHat do
+                while _G.autoChapeu do
                     pcall(function()
                         local args = {400001}
                         game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("RerollOrnament"):InvokeServer(unpack(args))
@@ -348,18 +348,18 @@ local function setupMainTab()
                 end
             end)
         else
-            print("🔴 Auto Hat DEACTIVATED")
+            print("🔴 Auto Head DESATIVADO")
         end
     end, tabs["Main"].content)
 
-    -- Auto Backpack Toggle FIXED
-    local AutoBackpackToggle, AutoBackpackBox, setAutoBackpackState = CreateToggle("Auto Backpack", function(isActive)
-        _G.autoBackpack = isActive
+    -- Toggle Auto Wing CORRIGIDO
+    local AutoWingToggle, AutoWingBox, setAutoWingState = CriarToggle("Auto Wing", function(isActive)
+        _G.autoWing = isActive
         
         if isActive then
-            print("🟢 Auto Backpack ACTIVATED")
+            print("🟢 Auto Wing ATIVADO")
             task.spawn(function()
-                while _G.autoBackpack do
+                while _G.autoWing do
                     pcall(function()
                         local args = {400002}
                         game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("RerollOrnament"):InvokeServer(unpack(args))
@@ -368,20 +368,20 @@ local function setupMainTab()
                 end
             end)
         else
-            print("🔴 Auto Backpack DEACTIVATED")
+            print("🔴 Auto Wing DESATIVADO")
         end
     end, tabs["Main"].content)
 end
 
--- ===== FARM TAB =====
+-- ===== ABA FARM =====
 local function setupFarmTab()
-    -- AUTO FARM SYSTEM (NPC Gatherer) FIXED
+    -- SISTEMA AUTO FARM (NPC Gatherer) CORRIGIDO
     local autoFarmSystem = {
         active = false,
         connection = nil,
         
         SETTINGS = {
-            NPC_FOLDER_NAMES = {"Enemies"},
+            NPC_FOLDER_NAMES = {"Enemys"},
             MAX_DISTANCE = 900,
             PULL_DISTANCE = 30,
             LOOP_DELAY = 0.2,
@@ -406,7 +406,7 @@ local function setupFarmTab()
                 return
             end
             
-            print("[BUFF] Applying buffs...")
+            print("[BUFF] Aplicando buffs...")
             self.lastBuffTime = time()
             
             local character = LocalPlayer.Character
@@ -457,7 +457,7 @@ local function setupFarmTab()
             if not self.npcFolder then
                 self.npcFolder = self:findNPCDirectory()
                 if not self.npcFolder then
-                    warn("No NPC folders found!")
+                    warn("Nenhuma pasta de NPCs encontrada!")
                     return
                 end
             end
@@ -475,7 +475,7 @@ local function setupFarmTab()
             end
             
             if gathered > 0 then
-                print("[NPC GATHER] " .. gathered .. " NPCs gathered!")
+                print("[NPC GATHER] " .. gathered .. " NPCs juntados!")
             end
         end,
         
@@ -486,7 +486,7 @@ local function setupFarmTab()
             self.npcFolder = nil
             self.lastBuffTime = 0
             
-            print("🟢 Auto Farm STARTED!")
+            print("🟢 Auto Farm INICIADO!")
             
             self.connection = RunService.Heartbeat:Connect(function()
                 if not self.active then return end
@@ -505,12 +505,12 @@ local function setupFarmTab()
                 self.connection = nil
             end
             
-            print("🔴 Auto Farm STOPPED!")
+            print("🔴 Auto Farm PARADO!")
         end
     }
 
-    -- Auto Farm Toggle FIXED
-    local AutoFarmToggle, AutoFarmBox, setAutoFarmState = CreateToggle("Auto Farm NPC", function(isActive)
+    -- Toggle Auto Farm CORRIGIDO
+    local AutoFarmToggle, AutoFarmBox, setAutoFarmState = CriarToggle("Auto Farm NPC", function(isActive)
         if isActive then
             autoFarmSystem:start()
         else
@@ -518,12 +518,12 @@ local function setupFarmTab()
         end
     end, tabs["Farm"].content)
 
-    -- Auto Click Toggle FIXED
-    local AutoClickToggle, AutoClickBox, setAutoClickState = CreateToggle("Auto Click", function(isActive)
+    -- Botão Auto Click CORRIGIDO
+    local AutoClickToggle, AutoClickBox, setAutoClickState = CriarToggle("Auto Click", function(isActive)
         _G.autoClick = isActive
         
         if isActive then
-            print("🟢 Auto Click ACTIVATED")
+            print("🟢 Auto Click ATIVADO")
             task.spawn(function()
                 while _G.autoClick do
                     pcall(function()
@@ -538,11 +538,11 @@ local function setupFarmTab()
                 end
             end)
         else
-            print("🔴 Auto Click DEACTIVATED")
+            print("🔴 Auto Click DESATIVADO")
         end
     end, tabs["Farm"].content)
 
-    local potion1 = CreateButton("Potion Luck V1", function()
+    local potion1 = CriarBotao("Potion Luck V1", function()
         pcall(function()
             local args = {
                 {
@@ -551,11 +551,11 @@ local function setupFarmTab()
                 }
             }
             game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("PotionMerge"):InvokeServer(unpack(args))
-            print("✅ Potion Luck used!")
+            print("✅ Potion Luck usada!")
         end)
     end, tabs["Farm"].content)
 
-    local potion2 = CreateButton("Potion Damage V1", function()
+    local potion2 = CriarBotao("Potion Damage V1", function()
         pcall(function()
             local args = {
                 {
@@ -564,11 +564,11 @@ local function setupFarmTab()
                 }
             }
             game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("PotionMerge"):InvokeServer(unpack(args))
-            print("✅ Potion Damage used!")
+            print("✅ Potion Damage usada!")
         end)
     end, tabs["Farm"].content)
 
-    local potion3 = CreateButton("Potion Gold V1", function()
+    local potion3 = CriarBotao("Potion Gold V1", function()
         pcall(function()
             local args = {
                 {
@@ -577,11 +577,11 @@ local function setupFarmTab()
                 }
             }
             game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("PotionMerge"):InvokeServer(unpack(args))
-            print("✅ Potion Gold used!")
+            print("✅ Potion Gold usada!")
         end)
     end, tabs["Farm"].content)
 
-    local potion4 = CreateButton("Potion Luck V2", function()
+    local potion4 = CriarBotao("Potion Luck V2", function()
         pcall(function()
             local args = {
                 {
@@ -590,11 +590,11 @@ local function setupFarmTab()
                 }
             }
             game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("PotionMerge"):InvokeServer(unpack(args))
-            print("✅ Potion Luck used!")
+            print("✅ Potion Luck usada!")
         end)
     end, tabs["Farm"].content)
 
-    local potion5 = CreateButton("Potion Damage V2", function()
+    local potion5 = CriarBotao("Potion Damage V2", function()
         pcall(function()
             local args = {
                 {
@@ -603,11 +603,11 @@ local function setupFarmTab()
                 }
             }
             game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("PotionMerge"):InvokeServer(unpack(args))
-            print("✅ Potion Damage used!")
+            print("✅ Potion Damage usada!")
         end)
     end, tabs["Farm"].content)
 
-    local potion6 = CreateButton("Potion Gold V2", function()
+    local potion6 = CriarBotao("Potion Gold V2", function()
         pcall(function()
             local args = {
                 {
@@ -616,19 +616,19 @@ local function setupFarmTab()
                 }
             }
             game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("PotionMerge"):InvokeServer(unpack(args))
-            print("✅ Potion Gold used!")
+            print("✅ Potion Gold usada!")
         end)
     end, tabs["Farm"].content)
 end
 
--- ===== AUTO TAB =====
+-- ===== ABA AUTOMÁTICO =====
 local function setupAutoTab()
-    -- Auto Raid World 3 Toggle FIXED
-    local AutoRaidW3Toggle, AutoRaidW3Box, setAutoRaidW3State = CreateToggle("Auto Raid World 3", function(isActive)
+    -- Toggle Auto Raid World 3 CORRIGIDO
+    local AutoRaidW3Toggle, AutoRaidW3Box, setAutoRaidW3State = CriarToggle("Auto Raid World 3", function(isActive)
         _G.autoRaidW3 = isActive
         
         if isActive then
-            print("🟢 Auto Raid W3 ACTIVATED")
+            print("🟢 Auto Raid W3 ATIVADO")
             task.spawn(function()
                 while _G.autoRaidW3 do
                     pcall(function()
@@ -639,16 +639,16 @@ local function setupAutoTab()
                 end
             end)
         else
-            print("🔴 Auto Raid W3 DEACTIVATED")
+            print("🔴 Auto Raid W3 DESATIVADO")
         end
     end, tabs["Auto"].content)
 
-    -- Auto Raid World 7 Toggle FIXED
-    local AutoRaidW7Toggle, AutoRaidW7Box, setAutoRaidW7State = CreateToggle("Auto Raid World 7", function(isActive)
+    -- Toggle Auto Raid World 7 CORRIGIDO
+    local AutoRaidW7Toggle, AutoRaidW7Box, setAutoRaidW7State = CriarToggle("Auto Raid World 7", function(isActive)
         _G.autoRaidW7 = isActive
         
         if isActive then
-            print("🟢 Auto Raid W7 ACTIVATED")
+            print("🟢 Auto Raid W7 ATIVADO")
             task.spawn(function()
                 while _G.autoRaidW7 do
                     pcall(function()
@@ -659,21 +659,21 @@ local function setupAutoTab()
                 end
             end)
         else
-            print("🔴 Auto Raid W7 DEACTIVATED")
+            print("🔴 Auto Raid W7 DESATIVADO")
         end
     end, tabs["Auto"].content)
     
-local collect1 = CreateButton("auto collect", function()
+local collect1 = CriarBotao("auto collect", function()
     if autoCollectActive then
-        -- Turn off
+        -- Desligar
         autoCollectActive = false
         if autoCollectConnection then
             autoCollectConnection:Disconnect()
             autoCollectConnection = nil
         end
-        print("🔴 Auto Collect deactivated!")
+        print("🔴 Auto Collect desativado!")
     else
-        -- Turn on
+        -- Ligar
         autoCollectActive = true
         local Players = game:GetService("Players")
         local LocalPlayer = Players.LocalPlayer
@@ -696,16 +696,16 @@ local collect1 = CreateButton("auto collect", function()
                 end
             end
         end)
-        print("🟢 Auto Collect activated!")
+        print("🟢 Auto Collect ativado!")
     end
 end, tabs["Auto"].content)
 
-local autoraid0 = CreateButton("auto raid beta", function()
+local autoraid0 = CriarBotao("auto raid beta", function()
 loadstring(game:HttpGet("https://raw.githubusercontent.com/erzaDuckie/testscript1/refs/heads/main/autoraid.js"))()
 end, tabs["Auto"].content)
 end
 
--- ===== PLAYER TAB =====
+-- ===== ABA PLAYER =====
 local function setupPlayerTab()
     -- Caixa de Walk Speed
     local WalkContainer = Instance.new("Frame")
@@ -731,7 +731,7 @@ local function setupPlayerTab()
     WalkBox.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
     WalkBox.BorderSizePixel = 0
     WalkBox.Text = "16"
-    WalkBox.PlaceholderText = "0-500"
+    WalkBox.PlaceholderText = "0-120"
     WalkBox.TextColor3 = Color3.fromRGB(255, 255, 255)
     WalkBox.Font = Enum.Font.SourceSansBold
     WalkBox.TextSize = 14
@@ -759,7 +759,7 @@ local function setupPlayerTab()
         
         local val = tonumber(WalkBox.Text)
         if val then
-            if val >= 0 and val <= 500 then
+            if val >= 0 and val <= 120 then
                 local character = LocalPlayer.Character
                 if character and character:FindFirstChild("Humanoid") then
                     character.Humanoid.WalkSpeed = val
@@ -800,8 +800,8 @@ local function setupPlayerTab()
     HitboxBox.Position = UDim2.new(0.62, 0, 0, 0)
     HitboxBox.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
     HitboxBox.BorderSizePixel = 0
-    HitboxBox.Text = "200"
-    HitboxBox.PlaceholderText = "0-5000"
+    HitboxBox.Text = "60"
+    HitboxBox.PlaceholderText = "0-2000"
     HitboxBox.TextColor3 = Color3.fromRGB(255, 255, 255)
     HitboxBox.Font = Enum.Font.SourceSansBold
     HitboxBox.TextSize = 14
@@ -832,7 +832,7 @@ local function setupPlayerTab()
             if val == 0 then
                 print("🔴 Kill Aura DESATIVADO")
                 _G.HitboxEnabled = false
-            elseif val > 0 and val <= 5000 then
+            elseif val > 0 and val <= 2000 then
                 _G.HitboxSize = val
                 _G.HitboxEnabled = true
                 print("🟢 Kill Aura: " .. val)
@@ -966,20 +966,19 @@ end
 
 setupSmoothScrolling()
 
--- Activate first tab by default
+-- Ativar a primeira aba por padrão
 if tabs["Main"] then
     tabs["Main"].button:MouseButton1Click()
 end
 
--- Initialize global variables
-_G.autoHat = false
-_G.autoBackpack = false
+-- Inicializar variáveis globais
+_G.autoChapeu = false
+_G.autoWing = false
 _G.autoRaidW3 = false
 _G.autoRaidW7 = false
-_G.autoClick = true
-_G.HitboxSize = 2000
+_G.autoClick = false
+_G.HitboxSize = 60
 _G.HitboxEnabled = true
 
-print("🚀 CITERRRR INTERFACE LOADED!")
-
-print("✅ Hitbox/Kill Aura system working perfectly!")
+print("🚀 INTERFACE RN TEAM CARREGADA!")
+print("✅ Sistema de Hitbox/Kill Aura funcionando perfeitamente!")
