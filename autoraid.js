@@ -25,15 +25,15 @@ local rankDropdownOpen = false
 --// Lista de mundos (sem Mundo 1 e Mundo 11)
 local worldOptions = {
     "All",
-    "Mundo 2",
-    "Mundo 3", 
-    "Mundo 4",
-    "Mundo 5",
-    "Mundo 6",
-    "Mundo 7",
-    "Mundo 8",
-    "Mundo 9",
-    "Mundo 10"
+    "STAGE 2",
+    "STAGE 3", 
+    "STAGE 4",
+    "STAGE 5",
+    "STAGE 6",
+    "STAGE 7",
+    "STAGE 8",
+    "STAGE 9",
+    "STAGE 10"
 }
 
 --// Opções de rank (removidos 4 e 7)
@@ -537,3 +537,4 @@ UserInputService.InputBegan:Connect(function(input)
 end)
 
 print("Auto Raid GUI completa carregada!")
+
