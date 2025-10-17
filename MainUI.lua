@@ -40,7 +40,7 @@ local Title = Instance.new("TextLabel")
 Title.Size = UDim2.new(0.8, 0, 1, 0)
 Title.Position = UDim2.new(0.1, 0, 0, 0)
 Title.BackgroundTransparency = 1
-Title.Text = "RN TEAM"
+Title.Text = "CITERRRR"
 Title.TextColor3 = Color3.fromRGB(255, 255, 255)
 Title.Font = Enum.Font.SourceSansBold
 Title.TextSize = 16
@@ -89,7 +89,7 @@ local Credits = Instance.new("TextLabel")
 Credits.Size = UDim2.new(1, 0, 0, 25)
 Credits.Position = UDim2.new(0, 0, 1, -25)
 Credits.BackgroundTransparency = 1
-Credits.Text = "YouTube: RN_TEAM"
+Credits.Text = "CITER BODOH"
 Credits.TextColor3 = Color3.fromRGB(200, 200, 200)
 Credits.Font = Enum.Font.SourceSansBold
 Credits.TextSize = 14
@@ -731,7 +731,7 @@ local function setupPlayerTab()
     WalkBox.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
     WalkBox.BorderSizePixel = 0
     WalkBox.Text = "16"
-    WalkBox.PlaceholderText = "0-200"
+    WalkBox.PlaceholderText = "0-500"
     WalkBox.TextColor3 = Color3.fromRGB(255, 255, 255)
     WalkBox.Font = Enum.Font.SourceSansBold
     WalkBox.TextSize = 14
@@ -759,7 +759,7 @@ local function setupPlayerTab()
         
         local val = tonumber(WalkBox.Text)
         if val then
-            if val >= 0 and val <= 200 then
+            if val >= 0 and val <= 500 then
                 local character = LocalPlayer.Character
                 if character and character:FindFirstChild("Humanoid") then
                     character.Humanoid.WalkSpeed = val
@@ -801,7 +801,7 @@ local function setupPlayerTab()
     HitboxBox.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
     HitboxBox.BorderSizePixel = 0
     HitboxBox.Text = "200"
-    HitboxBox.PlaceholderText = "0-3000"
+    HitboxBox.PlaceholderText = "0-5000"
     HitboxBox.TextColor3 = Color3.fromRGB(255, 255, 255)
     HitboxBox.Font = Enum.Font.SourceSansBold
     HitboxBox.TextSize = 14
@@ -832,7 +832,7 @@ local function setupPlayerTab()
             if val == 0 then
                 print("🔴 Kill Aura DESATIVADO")
                 _G.HitboxEnabled = false
-            elseif val > 0 and val <= 3000 then
+            elseif val > 0 and val <= 5000 then
                 _G.HitboxSize = val
                 _G.HitboxEnabled = true
                 print("🟢 Kill Aura: " .. val)
@@ -980,7 +980,6 @@ _G.autoClick = true
 _G.HitboxSize = 2000
 _G.HitboxEnabled = true
 
-print("🚀 RN TEAM INTERFACE LOADED!")
+print("🚀 CITERRRR INTERFACE LOADED!")
 
 print("✅ Hitbox/Kill Aura system working perfectly!")
-
