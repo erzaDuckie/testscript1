@@ -332,12 +332,12 @@ end
 
 -- ===== ABA PRINCIPAL =====
 local function setupMainTab()
-    -- Toggle Auto Head CORRIGIDO
-    local AutoChapeuToggle, AutoChapeuBox, setAutoChapeuState = CriarToggle("Auto Head", function(isActive)
+    -- Toggle Auto Chapéu CORRIGIDO
+    local AutoChapeuToggle, AutoChapeuBox, setAutoChapeuState = CriarToggle("Auto Gacha Headwear", function(isActive)
         _G.autoChapeu = isActive
         
         if isActive then
-            print("🟢 Auto Head ATIVADO")
+            print("🟢 Auto Gacha Headwear ACTIVE")
             task.spawn(function()
                 while _G.autoChapeu do
                     pcall(function()
@@ -348,18 +348,18 @@ local function setupMainTab()
                 end
             end)
         else
-            print("🔴 Auto Head DESATIVADO")
+            print("🔴 Auto Gacha Headwear DEACTIVATE")
         end
     end, tabs["Main"].content)
 
-    -- Toggle Auto Wing CORRIGIDO
-    local AutoWingToggle, AutoWingBox, setAutoWingState = CriarToggle("Auto Wing", function(isActive)
-        _G.autoWing = isActive
+    -- Toggle Auto Mochila CORRIGIDO
+    local AutoMochilaToggle, AutoMochilaBox, setAutoMochilaState = CriarToggle("Auto Gacha Wing", function(isActive)
+        _G.autoMochila = isActive
         
         if isActive then
-            print("🟢 Auto Wing ATIVADO")
+            print("🟢 Auto Gacha Wing ACTIVE")
             task.spawn(function()
-                while _G.autoWing do
+                while _G.autoMochila do
                     pcall(function()
                         local args = {400002}
                         game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("RerollOrnament"):InvokeServer(unpack(args))
@@ -368,7 +368,7 @@ local function setupMainTab()
                 end
             end)
         else
-            print("🔴 Auto Wing DESATIVADO")
+            print("🔴 Auto Gacha Wing DEACTIVATE")
         end
     end, tabs["Main"].content)
 end
@@ -973,7 +973,7 @@ end
 
 -- Inicializar variáveis globais
 _G.autoChapeu = false
-_G.autoWing = false
+_G.autoMochila = false
 _G.autoRaidW3 = false
 _G.autoRaidW7 = false
 _G.autoClick = false
