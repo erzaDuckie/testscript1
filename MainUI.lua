@@ -979,7 +979,6 @@ _G.autoRaidW7 = false
 _G.autoClick = true
 _G.HitboxSize = 2000
 _G.HitboxEnabled = true
-_G.autoCollectActive = true
 
 print("🚀 RN TEAM INTERFACE LOADED!")
 
