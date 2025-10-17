@@ -701,7 +701,7 @@ local collect1 = CreateButton("auto collect", function()
 end, tabs["Auto"].content)
 
 local autoraid0 = CreateButton("auto raid beta", function()
-loadstring(game:HttpGet("https://github.com/erzaDuckie/testscript1/blob/main/autoraid.js"))()
+loadstring(game:HttpGet("https://raw.githubusercontent.com/erzaDuckie/testscript1/refs/heads/main/autoraid.js"))()
 end, tabs["Auto"].content)
 end
 
@@ -983,3 +983,4 @@ _G.HitboxEnabled = true
 print("🚀 RN TEAM INTERFACE LOADED!")
 
 print("✅ Hitbox/Kill Aura system working perfectly!")
+
