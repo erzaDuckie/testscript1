@@ -1,0 +1,539 @@
+--// Services
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+local CoreGui = game:GetService("CoreGui")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Workspace = game:GetService("Workspace")
+local UserInputService = game:GetService("UserInputService")
+local TweenService = game:GetService("TweenService")
+
+--// Remotes
+local CreateRaidTeam = ReplicatedStorage:WaitForChild("Remotes"):WaitForChild("CreateRaidTeam")
+local StartChallengeRaidMap = ReplicatedStorage:WaitForChild("Remotes"):WaitForChild("StartChallengeRaidMap")
+
+--// Variables
+local running = false
+local userWorld = nil
+local selectedRanks = {}
+local selectedWorlds = {}
+
+--// GUI States
+local minimized = false
+local worldDropdownOpen = false
+local rankDropdownOpen = false
+
+--// World list (without World 1 and World 11)
+local worldOptions = {
+    "All",
+    "World 2",
+    "World 3", 
+    "World 4",
+    "World 5",
+    "World 6",
+    "World 7",
+    "World 8",
+    "World 9",
+    "World 10"
+}
+
+--// Rank options (removed 4 and 7)
+local rankOptions = {"All", "E", "D", "C", "A", "S", "G"}
+
+--// NOTIFICATION AND UTILITY FUNCTIONS
+local function notify(msg)
+	pcall(function()
+		game.StarterGui:SetCore("SendNotification", {
+			Title = "Raid Script",
+			Text = msg,
+			Duration = 3
+		})
+	end)
+	print("[RaidScript] " .. msg)
+end
+
+local function findEnchantChest()
+	return Workspace:FindFirstChild("EnchantChest")
+end
+
+local function teleportToChestInside(chest)
+	if chest and chest:IsA("Model") then
+		local char = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+		local root = char:WaitForChild("HumanoidRootPart")
+		local targetCFrame
+
+		if chest.PrimaryPart then
+			targetCFrame = chest.PrimaryPart.CFrame
+		else
+			local total = Vector3.new()
+			local count = 0
+			for _, part in pairs(chest:GetDescendants()) do
+				if part:IsA("BasePart") then
+					total += part.Position
+					count += 1
+				end
+			end
+			if count > 0 then
+				targetCFrame = CFrame.new(total / count)
+			end
+		end
+
+		if targetCFrame then
+			targetCFrame = targetCFrame + Vector3.new(0, 3, 0)
+			root.CFrame = targetCFrame
+			return true
+		end
+	end
+	return false
+end
+
+local function checkAirWallExists()
+	local mapsFolder = Workspace:FindFirstChild("Maps")
+	if not mapsFolder then return false, 0 end
+	
+	-- Check maps from 1 to 10 (without 0 and 11)
+	for i = 1, 10 do
+		local mapPath = mapsFolder:FindFirstChild("Map" .. i)
+		-- Also check Map 103 (which is the old Map 3)
+		if i == 3 then
+			mapPath = mapsFolder:FindFirstChild("Map103") or mapPath
+		end
+		
+		if mapPath and mapPath:FindFirstChild("Map") and mapPath.Map:FindFirstChild("AirWall") then
+			local airWall = mapPath.Map.AirWall
+			if airWall:FindFirstChild("1") and airWall:FindFirstChild("1"):IsA("Model") then
+				return true, i
+			end
+		end
+	end
+	return false, 0
+end
+
+--// MAIN SCRIPT FUNCTION
+local function executeSequence()
+	if not running then return end
+
+	while running do
+		-- If "All" in worlds, fill all worlds from 1 to 10 (event)
+		local worldsToUse = {}
+		if #selectedWorlds == 0 then  -- Means "All"
+			for i = 1, 10 do
+				table.insert(worldsToUse, tostring(i))
+			end
+		else
+			worldsToUse = selectedWorlds
+		end
+		
+		-- If "All" in ranks, fill all available ranks
+		local ranksToUse = {}
+		if #selectedRanks == 0 then  -- Means "All"
+			for i, option in ipairs(rankOptions) do
+				if option ~= "All" then
+					table.insert(ranksToUse, tonumber(option))
+				end
+			end
+		else
+			ranksToUse = selectedRanks
+		end
+		
+		-- Execute for each world and rank combination
+		for _, world in ipairs(worldsToUse) do
+			for _, rank in ipairs(ranksToUse) do
+				if not running then break end
+				local args = {tonumber("9300" .. world .. rank)}
+				pcall(function()
+					CreateRaidTeam:InvokeServer(unpack(args))
+				end)
+				wait(-99)
+			end
+			if not running then break end
+		end
+
+		if running then
+			pcall(function()
+				StartChallengeRaidMap:FireServer()
+			end)
+			task.wait(2)
+		end
+
+		local exists, mapNumber = checkAirWallExists()
+		if exists then
+			local chest = nil
+			-- REMOVED: time limit
+			while running and not chest do
+				chest = findEnchantChest()
+				if not chest then
+					task.wait(1)
+				end
+			end
+			if chest then
+				teleportToChestInside(chest)
+				task.wait(3)
+			else
+				task.wait(2)
+			end
+		else
+			task.wait(2)
+		end
+	end
+end
+
+--// BUTTON EFFECTS CONFIGURATION
+local function setupButtonEffects(button)
+	local originalColor = button.BackgroundColor3
+	
+	button.MouseEnter:Connect(function()
+		TweenService:Create(button, TweenInfo.new(0.2), {BackgroundColor3 = originalColor * 1.2}):Play()
+	end)
+	
+	button.MouseLeave:Connect(function()
+		TweenService:Create(button, TweenInfo.new(0.2), {BackgroundColor3 = originalColor}):Play()
+	end)
+	
+	-- Click effect
+	button.MouseButton1Down:Connect(function()
+		TweenService:Create(button, TweenInfo.new(0.1), {BackgroundColor3 = originalColor * 0.8}):Play()
+	end)
+	
+	button.MouseButton1Up:Connect(function()
+		TweenService:Create(button, TweenInfo.new(0.1), {BackgroundColor3 = originalColor * 1.2}):Play()
+	end)
+end
+
+--// DESTROY OLD PANEL
+local existing = CoreGui:FindFirstChild("AutoRaidPanel")
+if existing then existing:Destroy() end
+
+--// Main GUI
+local screenGui = Instance.new("ScreenGui", CoreGui)
+screenGui.Name = "AutoRaidPanel"
+screenGui.ResetOnSpawn = false
+
+local mainFrame = Instance.new("Frame", screenGui)
+mainFrame.Size = UDim2.new(0, 320, 0, 400)
+mainFrame.Position = UDim2.new(0.5, -160, 0.5, -200)
+mainFrame.BackgroundColor3 = Color3.fromRGB(20,20,25)
+mainFrame.BorderSizePixel = 0
+mainFrame.ClipsDescendants = true
+mainFrame.AnchorPoint = Vector2.new(0,0)
+
+local round = Instance.new("UICorner", mainFrame)
+round.CornerRadius = UDim.new(0,12)
+
+-- Header
+local header = Instance.new("Frame", mainFrame)
+header.Size = UDim2.new(1,0,0,50)
+header.Position = UDim2.new(0,0,0,0)
+header.BackgroundColor3 = Color3.fromRGB(30,30,40)
+header.BorderSizePixel = 0
+
+local headerCorner = Instance.new("UICorner", header)
+headerCorner.CornerRadius = UDim.new(0,12)
+
+local title = Instance.new("TextLabel", header)
+title.Size = UDim2.new(1, -100, 1, 0)
+title.Position = UDim2.new(0,12,0,0)
+title.BackgroundTransparency = 1
+title.Text = "🔥 Auto Raid 🔥"
+title.TextXAlignment = Enum.TextXAlignment.Left
+title.TextYAlignment = Enum.TextYAlignment.Center
+title.TextSize = 18
+title.Font = Enum.Font.GothamBold
+title.TextColor3 = Color3.fromRGB(240,240,245)
+
+-- Minimize & Close
+local btnClose = Instance.new("TextButton", header)
+btnClose.Size = UDim2.new(0,36,0,28)
+btnClose.Position = UDim2.new(1,-44,0,11)
+btnClose.Text = "X"
+btnClose.Font = Enum.Font.GothamBold
+btnClose.TextSize = 18
+btnClose.BackgroundColor3 = Color3.fromRGB(170,60,60)
+btnClose.TextColor3 = Color3.fromRGB(255,255,255)
+btnClose.BorderSizePixel = 0
+local closeCorner = Instance.new("UICorner", btnClose)
+closeCorner.CornerRadius = UDim.new(0,6)
+
+local btnMin = Instance.new("TextButton", header)
+btnMin.Size = UDim2.new(0,36,0,28)
+btnMin.Position = UDim2.new(1,-88,0,11)
+btnMin.Text = "–"
+btnMin.Font = Enum.Font.GothamBold
+btnMin.TextSize = 20
+btnMin.BackgroundColor3 = Color3.fromRGB(90,90,120)
+btnMin.TextColor3 = Color3.fromRGB(255,255,255)
+btnMin.BorderSizePixel = 0
+local minCorner = Instance.new("UICorner", btnMin)
+minCorner.CornerRadius = UDim.new(0,6)
+
+-- Content Frame
+local contentFrame = Instance.new("Frame", mainFrame)
+contentFrame.Size = UDim2.new(1,0,1,-50)
+contentFrame.Position = UDim2.new(0,0,0,50)
+contentFrame.BackgroundTransparency = 1
+
+-- Button to open world selection
+local btnWorld = Instance.new("TextButton", contentFrame)
+btnWorld.Size = UDim2.new(1, -24, 0, 50)
+btnWorld.Position = UDim2.new(0,12,0,12)
+btnWorld.Text = "Choose World"
+btnWorld.Font = Enum.Font.GothamBold
+btnWorld.TextSize = 16
+btnWorld.TextColor3 = Color3.fromRGB(255,255,255)
+btnWorld.BackgroundColor3 = Color3.fromRGB(45,45,65)
+btnWorld.BorderSizePixel = 0
+local worldBtnCorner = Instance.new("UICorner", btnWorld)
+worldBtnCorner.CornerRadius = UDim.new(0,10)
+
+-- Button to open rank selection
+local btnRank = Instance.new("TextButton", contentFrame)
+btnRank.Size = UDim2.new(1, -24, 0, 50)
+btnRank.Position = UDim2.new(0,12,0,74)
+btnRank.Text = "Choose Rank"
+btnRank.Font = Enum.Font.GothamBold
+btnRank.TextSize = 16
+btnRank.TextColor3 = Color3.fromRGB(255,255,255)
+btnRank.BackgroundColor3 = Color3.fromRGB(45,45,65)
+btnRank.BorderSizePixel = 0
+local rankBtnCorner = Instance.new("UICorner", btnRank)
+rankBtnCorner.CornerRadius = UDim.new(0,10)
+
+-- Start/Stop Button
+local btnStart = Instance.new("TextButton", contentFrame)
+btnStart.Size = UDim2.new(1, -24, 0, 50)
+btnStart.Position = UDim2.new(0,12,0,136)
+btnStart.Text = "START"
+btnStart.Font = Enum.Font.GothamBold
+btnStart.TextSize = 16
+btnStart.TextColor3 = Color3.fromRGB(255,255,255)
+btnStart.BackgroundColor3 = Color3.fromRGB(60, 120, 60)
+btnStart.BorderSizePixel = 0
+local startBtnCorner = Instance.new("UICorner", btnStart)
+startBtnCorner.CornerRadius = UDim.new(0,10)
+
+-- WORLD SCROLL FRAME
+local worldPanel = Instance.new("Frame", contentFrame)
+worldPanel.Size = UDim2.new(1,0,1,0)
+worldPanel.Position = UDim2.new(1,0,0,0) -- offscreen
+worldPanel.BackgroundColor3 = Color3.fromRGB(20,20,25) -- Background to not see through
+worldPanel.BorderSizePixel = 0
+
+local worldPanelCorner = Instance.new("UICorner", worldPanel)
+worldPanelCorner.CornerRadius = UDim.new(0,12)
+
+local scrollFrame = Instance.new("ScrollingFrame", worldPanel)
+scrollFrame.Size = UDim2.new(1, -24, 1, 0) -- Occupies full height
+scrollFrame.Position = UDim2.new(0,12,0,0)
+scrollFrame.BackgroundTransparency = 1
+scrollFrame.BorderSizePixel = 0
+scrollFrame.ScrollBarThickness = 0 -- Scroll bar removed
+scrollFrame.CanvasSize = UDim2.new(0,0,0,(#worldOptions * 48) + ((#worldOptions - 1) * 6))
+
+local uiList = Instance.new("UIListLayout", scrollFrame)
+uiList.SortOrder = Enum.SortOrder.LayoutOrder
+uiList.Padding = UDim.new(0,6)
+
+for i,name in ipairs(worldOptions) do
+    local b = Instance.new("TextButton", scrollFrame)
+    b.Size = UDim2.new(1,0,0,42)
+    b.Text = name
+    b.Font = Enum.Font.Gotham
+    b.TextSize = 16
+    b.TextColor3 = Color3.fromRGB(240,240,245)
+    b.BackgroundColor3 = Color3.fromRGB(40,40,55)
+    b.BorderSizePixel = 0
+    local c = Instance.new("UICorner", b)
+    c.CornerRadius = UDim.new(0,8)
+    
+    -- Apply effects to world button
+    setupButtonEffects(b)
+    
+    b.MouseButton1Click:Connect(function()
+        if name == "All" then
+            selectedWorlds = {}
+            btnWorld.Text = "All Worlds"
+            notify("Selected: All Worlds")
+        else
+            -- CORRECTION: The number for the event equals what's shown
+            -- World 2 in menu = 1 in event, World 3 in menu = 2 in event, etc.
+            local eventWorldNum = i - 1  -- i=1 (All), i=2 (World 2) = 1, i=3 (World 3) = 2, etc.
+            
+            selectedWorlds = {tostring(eventWorldNum)}
+            btnWorld.Text = name -- updates button with pretty name
+            notify("World selected: " .. name .. " (Event: " .. eventWorldNum .. ")")
+        end
+        TweenService:Create(worldPanel, TweenInfo.new(0.25, Enum.EasingStyle.Quart), {Position = UDim2.new(1,0,0,0)}):Play()
+    end)
+end
+
+-- RANK SCROLL FRAME
+local rankPanel = Instance.new("Frame", contentFrame)
+rankPanel.Size = UDim2.new(1,0,1,0)
+rankPanel.Position = UDim2.new(1,0,0,0) -- offscreen
+rankPanel.BackgroundColor3 = Color3.fromRGB(20,20,25) -- Background to not see through
+rankPanel.BorderSizePixel = 0
+
+local rankPanelCorner = Instance.new("UICorner", rankPanel)
+rankPanelCorner.CornerRadius = UDim.new(0,12)
+
+local rankScrollFrame = Instance.new("ScrollingFrame", rankPanel)
+rankScrollFrame.Size = UDim2.new(1, -24, 1, 0) -- Occupies full height
+rankScrollFrame.Position = UDim2.new(0,12,0,0)
+rankScrollFrame.BackgroundTransparency = 1
+rankScrollFrame.BorderSizePixel = 0
+rankScrollFrame.ScrollBarThickness = 0 -- Scroll bar removed
+rankScrollFrame.CanvasSize = UDim2.new(0,0,0,(#rankOptions * 48) + ((#rankOptions - 1) * 6))
+
+local rankUiList = Instance.new("UIListLayout", rankScrollFrame)
+rankUiList.SortOrder = Enum.SortOrder.LayoutOrder
+rankUiList.Padding = UDim.new(0,6)
+
+for i,option in ipairs(rankOptions) do
+    local b = Instance.new("TextButton", rankScrollFrame)
+    b.Size = UDim2.new(1,0,0,42)
+    b.Text = option
+    b.Font = Enum.Font.Gotham
+    b.TextSize = 16
+    b.TextColor3 = Color3.fromRGB(240,240,245)
+    b.BackgroundColor3 = Color3.fromRGB(40,40,55)
+    b.BorderSizePixel = 0
+    local c = Instance.new("UICorner", b)
+    c.CornerRadius = UDim.new(0,8)
+    
+    -- Apply effects to rank button
+    setupButtonEffects(b)
+    
+    b.MouseButton1Click:Connect(function()
+        btnRank.Text = option
+        if option == "All" then
+            selectedRanks = {}
+            notify("Selected: All Ranks")
+        else
+            local rankNum = tonumber(option)
+            selectedRanks = {rankNum}
+            notify("Rank selected: " .. option)
+        end
+        TweenService:Create(rankPanel, TweenInfo.new(0.25, Enum.EasingStyle.Quart), {Position = UDim2.new(1,0,0,0)}):Play()
+    end)
+end
+
+-- Apply effects to main buttons
+setupButtonEffects(btnWorld)
+setupButtonEffects(btnRank)
+setupButtonEffects(btnStart)
+setupButtonEffects(btnMin)
+setupButtonEffects(btnClose)
+
+-- Show world panel
+btnWorld.MouseButton1Click:Connect(function()
+    TweenService:Create(worldPanel, TweenInfo.new(0.25, Enum.EasingStyle.Quart), {Position = UDim2.new(0,0,0,0)}):Play()
+end)
+
+-- Show rank panel
+btnRank.MouseButton1Click:Connect(function()
+    TweenService:Create(rankPanel, TweenInfo.new(0.25, Enum.EasingStyle.Quart), {Position = UDim2.new(0,0,0,0)}):Play()
+end)
+
+-- Minimize / expand
+btnMin.MouseButton1Click:Connect(function()
+    minimized = not minimized
+    if minimized then
+        TweenService:Create(mainFrame, TweenInfo.new(0.25), {Size = UDim2.new(0, 200,0,50)}):Play()
+        contentFrame.Visible = false
+    else
+        contentFrame.Visible = true
+        TweenService:Create(mainFrame, TweenInfo.new(0.25), {Size = UDim2.new(0,320,0,400)}):Play()
+    end
+end)
+
+-- Close
+btnClose.MouseButton1Click:Connect(function()
+    screenGui:Destroy()
+    notify("Auto Raid closed")
+end)
+
+-- Start/Stop functionality
+btnStart.MouseButton1Click:Connect(function()
+	if running then
+		running = false
+		btnStart.Text = "START"
+		btnStart.BackgroundColor3 = Color3.fromRGB(60, 120, 60)
+		notify("Auto Raid stopped")
+	else
+		if btnWorld.Text == "Choose World" then
+			notify("Select a world first!")
+			return
+		end
+		if btnRank.Text == "Choose Rank" then
+			notify("Select a rank first!")
+			return
+		end
+
+		running = true
+		btnStart.Text = "STOP"
+		btnStart.BackgroundColor3 = Color3.fromRGB(180, 60, 60)  -- Red when active
+		
+		local worldText = btnWorld.Text
+		local rankText = btnRank.Text
+		notify("Auto Raid started! " .. worldText .. " | " .. rankText)
+		coroutine.wrap(executeSequence)()
+	end
+end)
+
+-- Drag anywhere in menu
+local dragging = false
+local dragStart = nil
+local startPos = nil
+
+local function startDrag(input)
+    dragging = true
+    dragStart = input.Position
+    startPos = mainFrame.Position
+    input.Changed:Connect(function()
+        if input.UserInputState == Enum.UserInputState.End then
+            dragging = false
+        end
+    end)
+end
+
+local function doDrag(input)
+    if not dragging then return end
+    local delta = input.Position - dragStart
+    mainFrame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X,
+                                   startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+end
+
+mainFrame.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+        startDrag(input)
+    end
+end)
+mainFrame.InputChanged:Connect(doDrag)
+
+-- Close panels when clicking outside
+UserInputService.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 then
+        local mousePos = UserInputService:GetMouseLocation()
+        local worldPanelPos = worldPanel.AbsolutePosition
+        local worldPanelSize = worldPanel.AbsoluteSize
+        local rankPanelPos = rankPanel.AbsolutePosition
+        local rankPanelSize = rankPanel.AbsoluteSize
+        
+        -- Check if clicked outside world panel
+        if worldPanel.Position == UDim2.new(0,0,0,0) then
+            if not (mousePos.X >= worldPanelPos.X and mousePos.X <= worldPanelPos.X + worldPanelSize.X and
+                   mousePos.Y >= worldPanelPos.Y and mousePos.Y <= worldPanelPos.Y + worldPanelSize.Y) then
+                TweenService:Create(worldPanel, TweenInfo.new(0.25, Enum.EasingStyle.Quart), {Position = UDim2.new(1,0,0,0)}):Play()
+            end
+        end
+        
+        -- Check if clicked outside rank panel
+        if rankPanel.Position == UDim2.new(0,0,0,0) then
+            if not (mousePos.X >= rankPanelPos.X and mousePos.X <= rankPanelPos.X + rankPanelSize.X and
+                   mousePos.Y >= rankPanelPos.Y and mousePos.Y <= rankPanelPos.Y + rankPanelSize.Y) then
+                TweenService:Create(rankPanel, TweenInfo.new(0.25, Enum.EasingStyle.Quart), {Position = UDim2.new(1,0,0,0)}):Play()
+            end
+        end
+    end
+end)
+
+print("Auto Raid GUI fully loaded!")
